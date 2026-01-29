@@ -1,14 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './ProductList.css'
 import CartItem from './CartItem';
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addItem } from "../redux/CartSlice";
 
 function ProductList({ onHomeClick }) {
     const [showCart, setShowCart] = useState(false);
-    const [showPlants, setShowPlants] = useState(false);
 
     const dispatch = useDispatch();
+
+    const cartItems = useSelector(state => state.cart.items);
+    const totalQuantity = cartItems.reduce(
+        (total, item) => total + item.quantity,
+        0
+    );
 
     const [addedToCart, setAddedToCart] = useState({});
 
@@ -29,17 +34,6 @@ function ProductList({ onHomeClick }) {
                     cost: "$12"
                 }
             ]
-        },
-        {
-            category: "Aromatic Fragrant Plants",
-            plants: [
-                {
-                    name: "Lavender",
-                    image: "https://images.unsplash.com/photo-1611909023032-2d6b3134ecba",
-                    description: "Calming scent, used in aromatherapy.",
-                    cost: "$20"
-                }
-            ]
         }
     ];
 
@@ -51,16 +45,6 @@ function ProductList({ onHomeClick }) {
         }));
     };
 
-    const handleHomeClick = (e) => {
-        e.preventDefault();
-        onHomeClick();
-    };
-
-    const handleCartClick = (e) => {
-        e.preventDefault();
-        setShowCart(true);
-    };
-
     const handleContinueShopping = (e) => {
         e.preventDefault();
         setShowCart(false);
@@ -68,9 +52,12 @@ function ProductList({ onHomeClick }) {
 
     return (
         <div>
+            <h3 style={{ color: "black" }}>
+                Cart Items: {totalQuantity}
+            </h3>
+
             {!showCart ? (
                 <div className="product-grid">
-
                     {plantsArray.map((section, index) => (
                         <div key={index}>
                             <h2>{section.category}</h2>
@@ -96,7 +83,6 @@ function ProductList({ onHomeClick }) {
                             </div>
                         </div>
                     ))}
-
                 </div>
             ) : (
                 <CartItem onContinueShopping={handleContinueShopping} />
